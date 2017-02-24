@@ -10,5 +10,5 @@ sourceloc = git@github.com:mmn80/idris-loader.git
 bugtracker = https://github.com/mmn80/idris-loader/issues
 
 sourcedir = src
-
-modules = Module1, Module2
+modules = Module1, Module2, EntryPoint
+opts = "--interface -o entryPoint.o"
