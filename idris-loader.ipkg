@@ -1,0 +1,14 @@
+package "idris-loader"
+
+brief = "A template Idirs package with a custom, external entry point"
+version = 0.1.0.0
+readme = README.md
+license = MIT
+author = Călin Ardelean <mmn80cpu@gmail.com>
+homepage = https://github.com/mmn80/idris-loader
+sourceloc = git@github.com:mmn80/idris-loader.git
+bugtracker = https://github.com/mmn80/idris-loader/issues
+
+sourcedir = src
+
+modules = Module1, Module2
