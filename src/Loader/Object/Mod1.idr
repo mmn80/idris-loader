@@ -1,4 +1,4 @@
-module Module2
+module Loader.Object.Mod2
 
 export
 testFn2 : Int -> String

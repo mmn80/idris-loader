@@ -1,4 +1,4 @@
-#include "src/entryPoint.h"
+#include "exports.h"
 
 int main() {
     VM* vm = idris_vm();

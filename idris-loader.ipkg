@@ -1,6 +1,6 @@
 package "idris-loader"
 
-brief = "A template Idirs package with a custom, external entry point"
+brief = "Dynamic modules test"
 version = 0.1.0.0
 readme = README.md
 license = MIT
@@ -10,5 +10,8 @@ sourceloc = git@github.com:mmn80/idris-loader.git
 bugtracker = https://github.com/mmn80/idris-loader/issues
 
 sourcedir = src
-modules = Module1, Module2, EntryPoint
-opts = "--interface -o entryPoint.o"
+modules = Loader.Shared.FFI
+        , Loader.Host.Main
+        , Loader.Object.Main
+        , Loader.Object.Mod1
+opts = "--interface -o ../exports.o"

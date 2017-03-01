@@ -1,14 +1,23 @@
-IDRIS := idris
-CC    := cc
-PKG   := idris-loader.ipkg
-EXE   := idris-loader
-EXP_O := src/entryPoint.o
-EXP_H := src/entryPoint.h
+IDRIS = idris
+CC    = cc
 
-build:
-	$(IDRIS) --build $(PKG)
-	$(CC) main.c $(EXP_O) `$(IDRIS) --include` `$(IDRIS) --link` -o $(EXE)
+EXE   = idris-loader
+EXPO  = exports.o
+EXPH  = exports.h
+
+MODS  = Loader/Object/$(EXPO) Loader/Host/$(EXPO)
+OBJS  = $(MODS:Loader/%=src/Loader/%)
+DIRS  = $(OBJS:%/$(EXPO)=%)
+
+$(MODS):
+	cd src; $(IDRIS) $(@:$(EXPO)=Main.idr) --interface -o $@
+
+build: $(MODS)
+	$(CC) src/Loader/Host/main.c $(OBJS) `$(IDRIS) --include` `$(IDRIS) --link` -o $(EXE)
 
 clean:
-	$(IDRIS) --clean $(PKG)
-	rm -f $(EXE) $(EXP_O) $(EXP_H)
+	for dir in $(DIRS) ; do \
+	    rm -f $$dir/$(EXPO) $$dir/$(EXPH) $$dir/*.ibc ; \
+	done
+	rm -f src/Loader/Shared/*.ibc
+	rm -f $(EXE)
