@@ -15,4 +15,4 @@ modules = Loader.Shared.FFI
 libs = dl
 main = Loader.Host.Main
 executable = "idris-loader"
-opts = "--cg-opt=-fPIC"
+opts = "--cg-opt=-rdynamic"
