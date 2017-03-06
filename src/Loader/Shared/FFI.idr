@@ -29,6 +29,12 @@ dlopen path flags = foreign FFI_C "dlopen" (String -> Int -> IO Ptr) path flags
 dlerror : IO String
 dlerror = foreign FFI_C "dlerror" (IO String)
 
+dlsym : Ptr -> String -> IO Ptr
+dlsym hnd sym = foreign FFI_C "dlsym" (Ptr -> String -> IO Ptr) hnd sym
+
+dlclose : Ptr -> IO Int
+dlclose hnd = foreign FFI_C "dlclose" (Ptr -> IO Int) hnd
+
 fileExists : String -> IO Bool
 fileExists path = do
   Right f <- openFile path Read | Left err => pure False
@@ -37,7 +43,7 @@ fileExists path = do
 
 export
 data Module : Type where
-  ModHandle : Ptr -> Module
+  ModHandle : String -> Ptr -> List (Ptr, Type) ->  Module
 
 modDir : String
 modDir = "src/"
@@ -66,12 +72,12 @@ sysCmd cmd = do
 
 buildModule : String -> IO SysResult
 buildModule mod = do
-  putStrLn $ "Building..."
+  putStrLn $ "Building " ++ mod ++ "..."
   let dir = modPath mod
   let cd = "cd " ++ modDir ++ "; "
   let idCmd = cd ++ "idris " ++ dir ++ "Main.idr --interface --cg-opt=-fPIC -o " ++ dir ++ oName
   Ok <- sysCmd idCmd | r => pure r
-  putStrLn "Linking..."
+  putStrLn $ "Linking " ++ mod ++ "..."
   let ccCmd = cd ++ "cc " ++ dir ++ oName ++ " -shared -fPIC -o " ++ dir ++ soName
   Ok <- sysCmd ccCmd | r => pure r
   pure Ok
@@ -86,11 +92,32 @@ loadModule mod rebuild = do
   hnd <- dlopen so RTLD_NOW
   if hnd == null
     then do err <- dlerror
-            putStrLn $ "Error while loading " ++ so ++ ":"
-            putStrLn $ "  " ++ err
+            putStrLn err
             pure Nothing
-    else do putStrLn "Module loaded successfuly!"
-            pure (Just $ ModHandle hnd)
+    else do dlerror
+            fn <- dlsym hnd "testFn1"
+            err <- dlerror
+            ok <- nullStr err
+            if ok then pure (Just $ ModHandle mod hnd [(fn, Int -> String)])
+                  else do putStrLn err; pure Nothing
+
+export
+closeModule : Module -> IO Bool
+closeModule (ModHandle mod hnd syms) = do
+  r <- dlclose hnd
+  pure (r == 0)
+
+export
+reloadModule : Module -> IO (Maybe Module)
+reloadModule (ModHandle mod hnd syms) = do
+  r <- dlclose hnd
+  if r /= 0 then do
+    err <- dlerror
+    putStrLn $ "dlclose error " ++ show r
+    ok <- nullStr err
+    when (not ok) $ putStrLn err
+    pure Nothing
+  else loadModule mod True
 
 %inline
 public export
