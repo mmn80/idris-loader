@@ -12,6 +12,7 @@ bugtracker = https://github.com/mmn80/idris-loader/issues
 sourcedir = src
 modules = Loader.Shared.FFI
         , Loader.Host.Main
-        , Loader.Object.Main
-        , Loader.Object.Mod1
-opts = "--interface -o ../exports.o"
+libs = dl
+main = Loader.Host.Main
+executable = "idris-loader"
+opts = "--cg-opt=-fPIC"

@@ -2,12 +2,9 @@ module Loader.Host.Main
 
 import Loader.Shared.FFI
 
-export myMain : IO ()
-myMain = do
-  loadModule "Object"
-  res <- call "testFn1" (Int -> IO Int) 42
-  printLn res
-  printLn "myMain ended..."
-
-exports : FFI_Export FFI_C "Loader/Host/exports.h" []
-exports = Fun myMain "myMain" $ End
+main : IO ()
+main = do
+  hnd <- loadModule "Loader.Object" False
+  --res <- call "testFn1" (Int -> IO Int) 42
+  --printLn res
+  putStrLn "main exit..."
