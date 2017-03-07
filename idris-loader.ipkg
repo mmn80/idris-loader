@@ -10,9 +10,9 @@ sourceloc = git@github.com:mmn80/idris-loader.git
 bugtracker = https://github.com/mmn80/idris-loader/issues
 
 sourcedir = src
-modules = Loader.Shared.FFI
-        , Loader.Host.Main
+modules = System.Dynamic.Linker, System.Dynamic.Loader
+main = Main
+makefile = Makefile
 libs = dl
-main = Loader.Host.Main
-executable = "idris-loader"
 opts = "--cg-opt=-rdynamic"
+executable = loader
