@@ -7,14 +7,15 @@ import System.Dynamic.Loader
 
 main : IO ()
 main = do
-  Just m <- loadModule "Module1" ["testFn1"] False | _ => pure ()
-  Just ptr <- pure (modSymbol m "testFn1") | _ => pure ()
+  Just m1 <- loadModule "Module1" ["testFn1"] False | _ => pure ()
+  Just m2 <- loadModule "Module2" ["testFn2"] False | _ => pure ()
+  Just ptr <- pure (modSymbol m1 "testFn1") | _ => pure ()
   putStrLn "Calling testFn1..."
   vm <- getMyVM
   r <- foreign FFI_C "_testFn1" (Ptr -> Ptr -> Int -> IO String) ptr vm 42
   putStrLn r
   --putStrLn "Reloading test..."
   --Just m' <- reloadModule m | _ => pure ()
-  ok <- closeModule m
-  if ok then putStrLn "Closed ok..."
-  else putStrLn "Error closing..."
+  closeModule m2
+  closeModule m1
+  pure ()
